@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes App</title>
+<style>
+  /* Basic styling */
+  body {
+    font-family: 'Lobster', cursive;
+    background-color: #f0e6f4; /* Lavender color */
+    margin: 0;
+    padding: 0;
+    background-image: url('https://th.bing.com/th/id/R.fa83b43e230511f0c5ed694f6ff52e3c?rik=QyCGnikAfWFx6A&riu=http%3a%2f%2fwww.pixelstalk.net%2fwp-content%2fuploads%2f2016%2f05%2fPhoto-sky-wallpapers-desktop-desgins.jpg&ehk=muUqLVJS1CYeg0WwHi2FJ0UWVQzt76kjoP2TccDyEg4%3d&risl=&pid=ImgRaw&r=0'); /* Background image of notes */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  .banner {
+    background-color: #af8dfc; /* Lavender purple color */
+    color: #fff;
+    padding: 30px;
+    text-align: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    margin-left: -20px;
+    margin-right: -20px;
+    margin-bottom: 20px;
+  }
+  h1 {
+    margin: 0;
+    font-size: 36px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  input[type="text"],
+  textarea {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  textarea {
+    height: 100px;
+  }
+  button {
+    padding: 10px 20px;
+    background-color: #af8dfc; /* Lavender purple color */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  button:hover {
+    background-color: #8664c6; /* Darker lavender purple color */
+  }
+  .note {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .note h3 {
+    margin-top: 0;
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .note p {
+    margin: 0;
+    color: #666;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .note-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .note.active .note-content {
+    max-height: 200px; /* Adjust as needed */
+  }
+  .note-buttons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  .note-buttons button {
+    padding: 5px 10px;
+    margin-left: 5px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .note-buttons button:hover {
+    background-color: #c82333;
+  }
+</style>
+</head>
+<body>
+<div class="banner">
+  <h1>Notes App</h1>
+</div>
+<div class="container">
+  <input type="text" id="searchInput" oninput="searchNotes()" placeholder="Search notes...">
+  <input type="text" id="noteTitle" placeholder="Enter note title">
+  <textarea id="noteContent" placeholder="Enter note content"></textarea>
+  <button onclick="addNote()">Add Note</button>
+  <div id="notes"></div>
+</div>
+<script>
+  function addNote() {
+    var title = document.getElementById("noteTitle").value;
+    var content = document.getElementById("noteContent").value;
+    var notesContainer = document.getElementById("notes");
+    
+    if (title.trim() === "" || content.trim() === "") {
+      alert("Please enter both title and content for the note.");
+      return;
+    }
+    
+    var note = document.createElement("div");
+    note.className = "note";
+    
+    var noteHeader = document.createElement("h3");
+    noteHeader.textContent = title;
+    noteHeader.onclick = function() {
+      this.parentNode.classList.toggle("active");
+    };
+    
+    var noteContent = document.createElement("div");
+    noteContent.className = "note-content";
+    noteContent.innerHTML = "<p>" + content + "</p>";
+    
+    var noteButtons = document.createElement("div");
+    noteButtons.className = "note-buttons";
+    
+    var deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+    deleteButton.onclick = function() {
+      this.parentNode.parentNode.remove();
+    };
+    
+    noteButtons.appendChild(deleteButton);
+    
+    note.appendChild(noteHeader);
+    note.appendChild(noteContent);
+    note.appendChild(noteButtons);
+    
+    notesContainer.appendChild(note);
+    
+    // Clear input fields after adding note
+    document.getElementById("noteTitle").value = "";
+    document.getElementById("noteContent").value = "";
+  }
+
+  function searchNotes() {
+    var input, filter, notes, noteTitles, i, txtValue;
+    input = document.getElementById("searchInput");
+    filter = input.value.toUpperCase();
+    notes = document.getElementById("notes");
+    noteTitles = notes.getElementsByTagName("h3");
+    for (i = 0; i < noteTitles.length; i++) {
+      txtValue = noteTitles[i].textContent || noteTitles[i].innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        noteTitles[i].parentNode.style.display = "";
+      } else {
+        noteTitles[i].parentNode.style.display = "none";
+      }
+    }
+  }
+</script>
+</body>
+</html>
